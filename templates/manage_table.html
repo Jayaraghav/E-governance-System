@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage {{ table_name }} - E-Governance Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg mb-8">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-xl font-bold">Manage {{ table_name }}</div>
+                <div class="space-x-4">
+                    <a href="{{ url_for('employee_dashboard') }}" class="text-blue-500">Dashboard</a>
+                    <a href="{{ url_for('logout') }}" class="text-red-500">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4">
+        <!-- Add New Record Form -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4">Add New Record</h3>
+            <form id="addForm" class="grid grid-cols-2 gap-4" onsubmit="addRecord(event)">
+                {% for column in data[0].keys() %}
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">{{ column }}</label>
+                    <input type="text" name="{{ column }}" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                {% endfor %}
+                <div class="col-span-2">
+                    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded-lg">Add Record</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Data Table -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-xl font-bold mb-4">Existing Records</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead>
+                        <tr>
+                            {% for column in data[0].keys() %}
+                            <th class="px-4 py-2 bg-gray-50">{{ column }}</th>
+                            {% endfor %}
+                            <th class="px-4 py-2 bg-gray-50">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data %}
+                        <tr class="border-t" data-key="{{ row[primary_key_column] }}">
+                            {% for value in row.values() %}
+                            <td class="px-4 py-2">{{ value }}</td>
+                            {% endfor %}
+                            <td class="px-4 py-2">
+                                <button onclick="showEditModal('{{ row[primary_key_column] }}')" class="bg-blue-500 text-white px-2 py-1 rounded mr-2">Edit</button>
+                                <button onclick="deleteRecord('{{ row[primary_key_column] }}')" class="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Record Modal -->
+    <div id="editModal" class="fixed inset-0 hidden bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-md p-6 w-full max-w-lg">
+            <h3 class="text-xl font-bold mb-4">Edit Record</h3>
+            <form id="editForm" class="grid grid-cols-2 gap-4" onsubmit="updateRecord(event)">
+                {% for column in data[0].keys() %}
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2">{{ column }}</label>
+                    <input type="text" name="{{ column }}" id="edit-{{ column }}" class="w-full px-3 py-2 border rounded-lg">
+                </div>
+                {% endfor %}
+                <div class="col-span-2 flex justify-end space-x-4">
+                    <button type="button" onclick="closeEditModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentKey = null;
+
+        function addRecord(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById("addForm"));
+
+            fetch(`/employee/manage/{{ table_name }}`, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => location.reload());
+        }
+
+        function showEditModal(key) {
+            currentKey = key;
+            const row = document.querySelector(`tr[data-key='${key}']`);
+            const cells = row.querySelectorAll('td');
+
+            {% for column in data[0].keys() %}
+                document.getElementById("edit-{{ column }}").value = cells[{{ loop.index0 }}].innerText;
+            {% endfor %}
+
+            document.getElementById("editModal").classList.remove("hidden");
+        }
+
+        function closeEditModal() {
+            document.getElementById("editModal").classList.add("hidden");
+            currentKey = null;
+        }
+
+        function updateRecord(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById("editForm"));
+
+            fetch(`/employee/manage/{{ table_name }}?{{ primary_key_column }}=${currentKey}`, {
+                method: 'PUT',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                location.reload();
+            });
+        }
+
+        function deleteRecord(key) {
+            if (confirm('Are you sure you want to delete this record?')) {
+                fetch(`/employee/manage/{{ table_name }}?{{ primary_key_column }}=${key}`, {
+                    method: 'DELETE',
+                })
+                .then(response => response.json())
+                .then(data => location.reload());
+            }
+        }
+    </script>
+</body>
+</html>

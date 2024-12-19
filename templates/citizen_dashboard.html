@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Citizen Dashboard - E-Governance Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <nav class="bg-white shadow-lg mb-8">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="text-xl font-bold">Citizen Dashboard</div>
+                <div class="space-x-4">
+                    <a href="{{ url_for('citizen_dashboard') }}" class="text-blue-500">Dashboard</a>
+                    <a href="{{ url_for('view_csc_centers') }}" class="text-blue-500">CSC Centers</a>
+                    <a href="{{ url_for('logout') }}" class="text-red-500">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {% if view == "dashboard" %}
+                <!-- Services Section -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Available Services</h3>
+                    <ul class="space-y-2">
+                        {% for service in services %}
+                        <li class="p-2 bg-gray-50 rounded">
+                            {{ service.serv }} - ₹{{ service.govt_fee }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Vacancies Section -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Latest Vacancies</h3>
+                    <ul class="space-y-2">
+                        {% for vacancy in vacancies %}
+                        <li class="p-2 bg-gray-50 rounded">
+                            {{ vacancy.name }} - {{ vacancy.locality }}
+                            <div class="text-sm text-gray-600">
+                                Positions: {{ vacancy.vacancies }} | Salary: ₹{{ vacancy.salary }}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if view == "csc_centers" %}
+                <!-- CSC Center Services Section -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">CSC Center Services</h3>
+                    <ul class="space-y-2">
+                        {% for center in csc_centers %}
+                        <li class="p-2 bg-gray-50 rounded">
+                            <strong>{{ center.centre_name }} ({{ center.location }})</strong><br>
+                            Phone: {{ center.Phone_no }}
+                            <ul class="mt-2 ml-4 list-disc">
+                                {% for service in center.services %}
+                                <li>{{ service }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

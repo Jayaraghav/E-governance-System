@@ -1,0 +1,8 @@
+/* static/css/style.css */
+body {
+    font-family: Arial, sans-serif;
+}
+form {
+    max-width: 300px;
+    margin: auto;
+}

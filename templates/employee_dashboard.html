@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Employee Dashboard{% endblock %}</title>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="space-y-6">
+    <h1 class="text-2xl font-bold">Employee Dashboard</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Your Permissions</h2>
+        <div class="space-y-2">
+            {% for permission in permissions %}
+                <div class="p-2 bg-gray-100 rounded">
+                    {{ permission.type }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Manage Data</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a href="{{ url_for('manage_table', table_name='Services') }}" 
+               class="p-4 bg-blue-100 rounded hover:bg-blue-200">
+                Manage Services
+            </a>
+            <a href="{{ url_for('manage_table', table_name='Department') }}" 
+               class="p-4 bg-blue-100 rounded hover:bg-blue-200">
+                Manage Departments
+            </a>
+            <a href="{{ url_for('manage_table', table_name='CSC') }}" 
+               class="p-4 bg-blue-100 rounded hover:bg-blue-200">
+                Manage CSC Centers
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

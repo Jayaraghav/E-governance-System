@@ -1,0 +1,23 @@
+<!-- templates/emp_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Employee Dashboard</title>
+</head>
+<body>
+    <h2>Employee Dashboard</h2>
+    <h3>Departments</h3>
+    <ul>
+        {% for department in departments %}
+            <li>{{ department.Dept_name }} - Collected: {{ department.amount_collected }}</li>
+        {% endfor %}
+    </ul>
+    <h3>Employees</h3>
+    <ul>
+        {% for employee in employees %}
+            <li>{{ employee.Name }} - Position: {{ employee.Postn }}</li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
