@@ -1,0 +1,342 @@
+ create database e_governance;
+
+
+ use e_governance;
+
+ CREATE TABLE Department (
+      Dept_id INT PRIMARY KEY,
+      Dept_name VARCHAR(255),
+      amt_coll DECIMAL(10, 2),
+      coll_method VARCHAR(255)
+     );
+
+
+ CREATE TABLE Employees (
+      emp_id INT PRIMARY KEY,
+      Name VARCHAR(255),
+      DOB DATE,
+      Postn VARCHAR(255),
+      Type VARCHAR(255),
+      Salary DECIMAL(10, 2),
+      Dept_id INT,
+      FOREIGN KEY (Dept_id) REFERENCES Department(Dept_id)
+     );
+
+
+ CREATE TABLE Login (
+      Usname VARCHAR(255) PRIMARY KEY,
+      pwd VARCHAR(255),
+      emp_id INT,
+      FOREIGN KEY (emp_id) REFERENCES Employees(emp_id)
+     );
+
+
+ CREATE TABLE Services (
+      serv_code INT PRIMARY KEY,
+      Dept_id INT,
+      serv VARCHAR(255),
+      govt_fee DECIMAL(10, 2),
+      FOREIGN KEY (Dept_id) REFERENCES Department(Dept_id)
+     );
+
+
+ CREATE TABLE Permission (
+      permission_id INT PRIMARY KEY,
+      type VARCHAR(255),
+      emp_id INT,
+      FOREIGN KEY (emp_id) REFERENCES Employees(emp_id)
+     );
+
+
+ CREATE TABLE Payment (
+      payment_id INT PRIMARY KEY,
+      Type VARCHAR(255),
+      source_accno VARCHAR(255),
+      sink_accno VARCHAR(255),
+      emp_id INT,
+      serv_code INT,
+      FOREIGN KEY (emp_id) REFERENCES Employees(emp_id),
+      FOREIGN KEY (serv_code) REFERENCES Services(serv_code)
+     );
+
+
+ CREATE TABLE Citizen (
+      Aadhar VARCHAR(12) PRIMARY KEY,
+      Name VARCHAR(255),
+      DOB DATE,
+      Gender VARCHAR(255),
+      role VARCHAR(255)
+     );
+
+
+ CREATE TABLE Citizen_Documents (
+      doc_id INT PRIMARY KEY,
+      Aadhar VARCHAR(12),
+      doc_type VARCHAR(255),
+      doc_value TEXT,
+      FOREIGN KEY (Aadhar) REFERENCES Citizen(Aadhar)
+     );
+
+
+
+ CREATE TABLE Citizen_Login (
+      Usname VARCHAR(255) PRIMARY KEY,
+      pwd VARCHAR(255),
+      Aadhar VARCHAR(12),
+      FOREIGN KEY (Aadhar) REFERENCES Citizen(Aadhar)
+     );
+
+
+ CREATE TABLE CSC (
+      csc_id INT PRIMARY KEY,
+      Phone_no VARCHAR(15),
+      Dept_id INT,
+      centre_name VARCHAR(255),
+      location VARCHAR(255),
+      FOREIGN KEY (Dept_id) REFERENCES Department(Dept_id)
+     );
+
+
+ CREATE TABLE CSC_Schemes (
+      scheme_id INT PRIMARY KEY,
+      scheme VARCHAR(255),
+      csc_id INT,
+      FOREIGN KEY (csc_id) REFERENCES CSC(csc_id)
+     );
+
+
+ CREATE TABLE PDS (
+      rationno INT PRIMARY KEY,
+      goods VARCHAR(255),
+      type VARCHAR(255),
+      Aadhar VARCHAR(12),
+      FOREIGN KEY (Aadhar) REFERENCES Citizen(Aadhar)
+     );
+
+
+ CREATE TABLE Companies (
+      Company_id INT PRIMARY KEY,
+      name VARCHAR(255),
+      mail_id VARCHAR(255),
+      category VARCHAR(255),
+      sector VARCHAR(255),
+      Phone_no VARCHAR(15),
+      address TEXT
+     );
+
+
+ CREATE TABLE Projects (
+      Project_id INT PRIMARY KEY,
+      Company_id INT,
+      scheme_id INT,
+      amt_allotted DECIMAL(10, 2),
+      FOREIGN KEY (Company_id) REFERENCES Companies(Company_id),
+      FOREIGN KEY (scheme_id) REFERENCES CSC_Schemes(scheme_id)
+     );
+
+
+ CREATE TABLE Vacancies (
+      vacancy_id INT PRIMARY KEY,
+      Company_id INT,
+      locality VARCHAR(255),
+      vacancies INT,
+      salary DECIMAL(10, 2),
+      FOREIGN KEY (Company_id) REFERENCES Companies(Company_id)
+     );
+
+
+ CREATE TABLE Bill (
+      Billno INT PRIMARY KEY,
+      total DECIMAL(10, 2),
+      servicecode INT,
+      emp_id INT,
+      FOREIGN KEY (servicecode) REFERENCES Services(serv_code),
+      FOREIGN KEY (emp_id) REFERENCES Employees(emp_id)
+     );
+
+
+ CREATE TABLE Service_CSC (
+      serv_code INT,
+      csc_id INT,
+      PRIMARY KEY (serv_code, csc_id),
+      FOREIGN KEY (serv_code) REFERENCES Services(serv_code),
+      FOREIGN KEY (csc_id) REFERENCES CSC(csc_id)
+     );
+
+
+ CREATE TABLE Citizen_Service_Access (
+      Usname VARCHAR(255),
+      serv_code INT,
+      PRIMARY KEY (Usname, serv_code),
+      FOREIGN KEY (Usname) REFERENCES Citizen_Login(Usname),
+      FOREIGN KEY (serv_code) REFERENCES Services(serv_code)
+     );
+
+
+ CREATE TABLE Employee_Department (
+      emp_id INT,
+      Dept_id INT,
+      PRIMARY KEY (emp_id, Dept_id),
+      FOREIGN KEY (emp_id) REFERENCES Employees(emp_id),
+      FOREIGN KEY (Dept_id) REFERENCES Department(Dept_id)
+     );
+
+
+CREATE TABLE Citizen_Logs (
+    log_id INT PRIMARY KEY AUTO_INCREMENT,
+    Usname VARCHAR(255),
+    action VARCHAR(255),
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (Usname) REFERENCES Citizen_Login(Usname)
+);
+
+ INSERT INTO Department (Dept_id, Dept_name, amt_coll, coll_method)
+     VALUES
+     (1, 'Finance', 1000000.00, 'Online'),
+     (2, 'HR', 500000.00, 'Offline'),
+     (3, 'Marketing', 200000.00, 'Online'),
+     (4, 'Operations', 750000.00, 'Offline');
+
+
+ INSERT INTO Employees (emp_id, Name, DOB, Postn, Type, Salary, Dept_id)
+     VALUES
+     (1, 'John Doe', '1985-10-15', 'Manager', 'Full-time', 75000.00, 1),
+     (2, 'Jane Smith', '1990-04-20', 'HR Specialist', 'Full-time', 55000.00, 2),
+     (3, 'Michael Brown', '1992-07-05', 'Marketing Manager', 'Full-time', 70000.00, 3),
+     (4, 'Emily Davis', '1988-11-12', 'Operations Specialist', 'Full-time', 60000.00, 4);
+
+
+ INSERT INTO Login (Usname, pwd, emp_id)
+     VALUES
+     ('johndoe', 'password123', 1),
+     ('janesmith', 'mypassword', 2),
+     ('michaelbrown', 'marketingpass', 3),
+     ('emilydavis', 'opspecialpass', 4);
+
+
+ INSERT INTO Services (serv_code, Dept_id, serv, govt_fee)
+     VALUES
+     (101, 1, 'Tax Filing', 100.00),
+     (102, 2, 'Employee Benefits', 50.00),
+     (103, 3, 'Ad Campaign', 200.00),
+     (104, 4, 'Supply Chain Management', 150.00);
+
+ INSERT INTO Permission (permission_id, type, emp_id)
+     VALUES
+     (1, 'Admin', 1),
+     (2, 'View Only', 2),
+     (3, 'Editor', 3),
+     (4, 'Admin', 4);
+
+
+ INSERT INTO Payment (payment_id, Type, source_accno, sink_accno, emp_id, serv_code)
+     VALUES
+     (1, 'Debit', 'ACC12345', 'ACC67890', 1, 101),
+     (2, 'Credit', 'ACC23456', 'ACC98765', 2, 102),
+     (3, 'Debit', 'ACC34567', 'ACC87654', 3, 103),
+     (4, 'Credit', 'ACC45678', 'ACC76543', 4, 104);
+
+
+ INSERT INTO Citizen (Aadhar, Name, DOB, Gender, role)
+     VALUES
+     ('123456789012', 'Alice Johnson', '1987-02-10', 'Female', 'Citizen'),
+     ('987654321098', 'Bob Williams', '1992-08-22', 'Male', 'Citizen'),
+     ('112233445566', 'Charlie Brown', '1985-06-15', 'Male', 'Citizen'),
+     ('223344556677', 'Dana White', '1990-12-05', 'Female', 'Citizen');
+
+
+ INSERT INTO Citizen_Documents (doc_id, Aadhar, doc_type, doc_value)
+     VALUES
+     (1, '123456789012', 'Passport', 'P123456789'),
+     (2, '987654321098', 'Voter ID', 'V987654321'),
+     (3, '112233445566', 'Driver License', 'DL112233445'),
+     (4, '223344556677', 'Aadhar Card', 'A223344556');
+
+
+ INSERT INTO Citizen_Login (Usname, pwd,  Aadhar)
+     VALUES
+     ('alicejohnson', 'alicepass',  '123456789012'),
+     ('bobwilliams', 'bobpass',  '987654321098'),
+     ('charliebrown', 'charliepass',  '112233445566'),
+     ('danawhite', 'danapass',  '223344556677');
+
+
+ INSERT INTO CSC (csc_id, Phone_no, Dept_id, centre_name, location)
+     VALUES
+     (1, '9876543210', 1, 'Central CSC', 'Downtown'),
+     (2, '9123456789', 2, 'East CSC', 'Uptown'),
+     (3, '9234567890', 3, 'West CSC', 'Suburbs'),
+     (4, '9345678901', 4, 'North CSC', 'City Center');
+
+
+ INSERT INTO CSC_Schemes (scheme_id, scheme, csc_id)
+     VALUES
+     (1, 'Senior Citizens Scheme', 1),
+     (2, 'Employment Benefits Scheme', 2),
+     (3, 'Youth Training Program', 3),
+     (4, 'Family Assistance Scheme', 4);
+
+
+ INSERT INTO PDS (rationno, goods, type, Aadhar)
+     VALUES
+     (1, 'Rice', 'Ration', '123456789012'),
+     (2, 'Wheat', 'Ration', '987654321098'),
+     (3, 'Sugar', 'Ration', '112233445566'),
+     (4, 'Oil', 'Ration', '223344556677');
+
+
+ INSERT INTO Companies (Company_id, name, mail_id, category, sector, Phone_no,
+     address)
+     VALUES
+     (1, 'Tech Solutions', 'tech@solutions.com', 'IT', 'Technology', '9876543210', '123 Tech Park'),
+     (2, 'Green Energy', 'green@energy.com', 'Renewable Energy', 'Energy', '9123456789', '456 Green Road'),
+     (3, 'Health Care Co.', 'health@care.com', 'Healthcare', 'Health', '9234567890', '789 Care St'),
+     (4, 'Food Corp', 'food@corp.com', 'Manufacturing', 'Food', '9345678901', '101 Food Ave');
+
+
+ INSERT INTO Projects (Project_id, Company_id, scheme_id, amt_allotted)
+     VALUES
+     (1, 1, 1, 50000.00),
+     (2, 2, 2, 30000.00),
+     (3, 3, 3, 45000.00),
+     (4, 4, 4, 60000.00);
+
+
+ INSERT INTO Vacancies (vacancy_id, Company_id, locality, vacancies, salary)
+     VALUES
+     (1, 1, 'Downtown', 5, 60000.00),
+     (2, 2, 'Uptown', 3, 45000.00),
+     (3, 3, 'Suburbs', 2, 55000.00),
+     (4, 4, 'City Center', 4, 40000.00);
+
+
+ INSERT INTO Bill (Billno, total, servicecode, emp_id)
+     VALUES
+     (1, 150.00, 101, 1),
+     (2, 100.00, 102, 2),
+     (3, 250.00, 103, 3),
+     (4, 180.00, 104, 4);
+
+
+ INSERT INTO Service_CSC (serv_code, csc_id)
+     VALUES
+     (101, 1),
+     (102, 2),
+     (103, 3),
+     (104, 4);
+
+
+ INSERT INTO Citizen_Service_Access (Usname, serv_code)
+     VALUES
+     ('alicejohnson', 101),
+     ('bobwilliams', 102),
+     ('charliebrown', 103),
+     ('danawhite', 104);
+
+
+ INSERT INTO Employee_Department (emp_id, Dept_id)
+     VALUES
+     (1, 1),
+     (2, 2),
+     (3, 3),
+     (4, 4);
